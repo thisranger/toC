@@ -1,0 +1,12 @@
+#include <stdint.h>
+#include "image.h"
+
+static const uint8_t bitmap[] = {
+{% for i in range(0, bitmap|length, 16) %}
+    {{ bitmap[i:i+16] | join(", ") }},
+{% endfor %}
+};
+
+{% for image in images %}
+const icon_t IMAGE_{{ image.name }} = {&bitmap[{{ image.offset }}], { {{ image.width }}, {{ image.height }} }};
+{% endfor %}

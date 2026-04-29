@@ -1,51 +1,34 @@
-# toC
+# toTemplate
 
-## Convert TTF to C Source Code
-This project provides a Python script to convert a TrueType Font (TTF) into a C source file containing bitmap font data. The generated C file includes glyph metadata, a bitmap array, and a global font structure for easy integration.
-\
-\
-See example folder for an implementation and the output.
+A collection of tools to convert various assets (fonts, images) into C source code using Jinja2 templates. This is particularly useful for embedded systems where you want to embed assets directly into your firmware.
 
-### Features
-✅ Converts TTF to a packed bitmap format (1 bit per pixel).  
-✅ Generates a `.c` file with font data and glyph metadata.  
-✅ Produces a PNG preview of the rendered font.  
-✅ Supports adjustable font sizes.  
+## Sub-projects
 
-## Usage
-### Command:
-```sh
-python ttfToC.py <font.ttf> <output.c> <preview.png> <global_variable_name> <size>
-```
+### 1. [ttfToTemplate](ttfToTemplate/)
+Convert TrueType Fonts (TTF) or OpenType Fonts (OTF) into C bitmap fonts.
+- Supports any font size.
+- Flexible output via Jinja2 templates.
+- Generates 1-bit packed bitmaps.
+- Optional PNG preview generation.
 
-### Example:
-```sh
-python ttfToC.py Minecraft.ttf output.c preview.png FNT16 16
-```
-
-### Output:
-- `output.c`: Contains the font bitmap array and glyph metadata.
-- `preview.png`: A visual preview of the font.
-- `FNT16_data`: The global font structure for accessing font information.
-
-## C Structure Overview
-The generated C file contains:
-```c
-static const uint8_t fontBitmap[] = { /* Packed 1-bit bitmap data */ };
-
-static const glyph_t fontGlyphs[] = {
-    {width, height, padding, x_offset, y_offset, &fontBitmap[offset]},
-    // More glyphs...
-};
-
-const font_t FNT16_data = {size, first_char, last_char, fontGlyphs};
-```
+### 2. [pngToTemplate](./pngToTemplate/)
+Convert PNG images into C bitmap arrays.
+- Generates 1-bit packed bitmaps from grayscale/thresholded images.
+- Flexible output via Jinja2 templates.
+- Supports individual files or entire directories.
 
 ## Requirements
+Most tools require:
 - Python 3
-- `freetype-py` (`pip install freetype-py`)
-- `pillow` (`pip install pillow`)
-- `numpy` (`pip install numpy`)
+- `jinja2`
+- `numpy`
+- `pillow`
+- `freetype-py` (for fonts)
 
-## Contributing
-Feel free to submit issues or contribute improvements!
+Install requirements for all tools:
+```sh
+pip install -r ttfToTemplate/requirements.txt -r pngToTemplate/requirements.txt
+```
+
+## Usage
+Each sub-project has its own `README.md` with specific usage instructions.

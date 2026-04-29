@@ -1,0 +1,22 @@
+#ifndef image_H
+#define image_H
+
+#include <stdio.h>
+#include <stdint.h>
+
+
+
+typedef struct {
+    uint8_t* data;
+    struct {
+        uint8_t width, height;
+    } size;
+} image_t;
+
+
+
+{% for image in images %}
+extern image_t IMAGE_{{ image.name }};
+{% endfor %}
+
+#endif /* image_H */

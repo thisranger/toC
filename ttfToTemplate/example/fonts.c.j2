@@ -1,0 +1,24 @@
+#include <stdint.h>
+#include "fonts.h"
+
+static const uint8_t fontBitmap[] = {
+{% for i in range(0, bitmap|length, 16) %}
+    {{ bitmap[i:i+16] | join(", ") }},
+{% endfor %}
+};
+
+{% for font in fonts %}
+static const glyph_t {{ font.name }}Glyphs[] = {
+{% for g in font.glyphs %}
+    { {{ g.width }}, {{ g.height }}, {{ g.padding }}, {{ g.x_offset }}, {{ g.y_offset }}, &fontBitmap[{{ g.buffer }}] },
+{% endfor %}
+};
+
+const font_t FONT_{{ font.name }}_{{font_size}} = {
+    {{ font_size }},
+    {{ first_char }},
+    {{ last_char }},
+    (glyph_t *) &{{ font.name }}Glyphs
+};
+
+{% endfor %}

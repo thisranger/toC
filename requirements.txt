@@ -1,3 +1,0 @@
-freetype-py
-pillow
-numpy
