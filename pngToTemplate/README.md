@@ -1,6 +1,6 @@
 # pngToTemplate
 
-## Convert PNG to C Source Code
+## Convert PNG to a template
 This project provides a Python script to convert PNG images into C source files using Jinja2 templates. It generates packed 1-bit bitmaps, which are ideal for monochrome displays in embedded systems.
 
 ### Features
@@ -28,19 +28,26 @@ python pngToTemplate.py example/image.c.j2 example/image.c example/file.png
 See [example/](./example/) for a complete setup with templates.
 
 ## Example Usage
-The following code demonstrates how to use the generated data to draw an icon.
+The following code demonstrates how to use the generated data to draw an image.
 
 ```c
-#include "image.h"
+void DrawImage(uint8_t xi, uint8_t yi, image_t* image, bool seeThrough)
+{
+    uint16_t  bitCounter = 0;
+    uint8_t* buffer = image->data;
 
-// Define these in your display driver
-void SetPixel(uint8_t x, uint8_t y, bool color);
-#define ON true
-#define OFF false
-
-void example() {
-    // Draw an icon
-    FONT_DrawIcon(0, 0, &IMAGE_file, false);
+    for (uint8_t x = 0; x < image->size.width; x++) {
+        for (uint8_t y = 0; y < image->size.height; y++) {
+            bool bit = buffer[bitCounter/8] & 1 << (7 - (bitCounter & 0b111));
+            bitCounter++;
+            
+            if (bit == ON) {
+                SetPixel(xi + x, yi + y, ON);
+            } else if (!seeThrough) {
+                SetPixel(xi + x, yi + y, OFF);
+            }
+        }
+    }
 }
 ```
 
@@ -54,14 +61,14 @@ The following variables are available in the Jinja2 template:
     - `offset`: Byte offset in the `bitmap` array where this image's data starts.
 
 ## C Structure
-The templates define an `icon_t` structure:
+The templates define an `image_t` structure:
 ```c
 typedef struct {
     const uint8_t* data;
     struct {
         uint8_t width, height;
     } size;
-} icon_t;
+} image_t;
 ```
 
 ## Requirements
