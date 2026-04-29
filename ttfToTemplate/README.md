@@ -1,7 +1,7 @@
 # ttfToC
 
 ## Convert TTF to C Source Code
-This project provides a Python script to convert TrueType Fonts (TTF) into C source files using Jinja2 templates. The generated C file typically includes glyph metadata, a bitmap array, and a global font structure for easy integration.
+This project provides a Python script to convert TrueType Fonts (TTF) into C source files using Jinja2 templates. The generated file typically includes glyph metadata, a bitmap array, and a global font structure for easy integration.
 
 ### Features
 Converts TTF to a packed bitmap format (1 bit per pixel).  
@@ -30,6 +30,52 @@ python ttfToTemplate.py example/fonts.c.j2 example/fonts.c 16 --preview fonts/
 
 See [example/](./example/) for a complete setup with templates.
 
+## Example Usage
+The following code demonstrates how to use the generated data to draw an image.
+
+```c
+glyph_t GetChar(font_t* font, char letter)
+{
+    if ( letter >= font->firstChar && letter <= font->lastChar){
+        return font->glyphs[letter - font->firstChar];
+    } else {
+        printf("Char not available\n");
+        return font->glyphs[0];
+    }
+}
+
+textDimensions_t SizeString(font_t* font, char* text)
+{
+    textDimensions_t dimensions = {0, font->size};
+
+    for (int32_t i = 0; text[i]; i++) {
+        dimensions.width += GetChar(font, text[i]).padding;
+    }
+    return dimensions;
+}
+
+void DrawText(uint8_t xt, uint8_t yt, font_t* font, const char* text)
+{
+    yt += font->size;
+
+    for (int32_t i = 0; text[i]; i++) {
+        glyph_t letter = GetChar(font, text[i]);
+
+        uint16_t  bitCounter = 0;
+        for (uint16_t x = 0; x < letter.width; x++) {
+            for (uint16_t y = 0; y < letter.height; y++) {
+                bool bit = letter.buffer[bitCounter/8] & 1 << (7 - (bitCounter & 0b111));
+                SetPixel(xt +x+letter.xOffset, yt + y-letter.yOffset, !bit);
+
+                bitCounter++;
+            }
+        }
+
+        xt += letter.padding;
+    }
+}
+```
+
 ## Template Variables
 The following variables are available in the Jinja2 template:
 - `bitmap`: A list of hex strings (e.g., `["0x00", "0xFF", ...]`) representing the packed 1-bit bitmap data.
@@ -56,9 +102,6 @@ typedef struct {
     glyph_t* glyphs;
 } font_t;
 ```
-
-## Example Usage
-See [example/README.md](./example/README.md) for detailed usage and helper functions for rendering.
 
 ## Requirements
 - Python 3
