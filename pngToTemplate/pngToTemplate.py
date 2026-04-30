@@ -23,10 +23,10 @@ def ProcessImage(imagePath, byteOffset):
     bitmap = []
     bitOffset = 0
     bitmap.append(0)
-    byteOffset = 1
+    byteOffset += 1
 
-    for y in range(height):
-        for x in range(width):
+    for x in range(width):
+        for y in range(height):
             if pixels[y, x] == 0:  # Black pixel
                 bitmap[-1] |= (1 << (7 - bitOffset))
             bitOffset += 1
