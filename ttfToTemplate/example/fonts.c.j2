@@ -14,7 +14,7 @@ static const glyph_t {{ font.name }}Glyphs[] = {
 {% endfor %}
 };
 
-const font_t FONT_{{ font.name }}_{{font_size}} = {
+font_t FONT_{{ font.name }}_{{font_size}} = {
     {{ font_size }},
     {{ first_char }},
     {{ last_char }},
