@@ -81,6 +81,8 @@ def GenerateImageFile(templatePath, outputPath, paths):
     with open(outputPath, "w") as f:
         f.write(output)
 
+    print(f"Generated: {outputPath}")
+
 
 
 if __name__ == "__main__":

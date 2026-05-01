@@ -15,7 +15,6 @@ IMAGE_HEIGHT = 256
 def ProcessFont(fontPath, fontSize, startOffset):
     face = freetype.Face(fontPath)
 
-    # 🔑 CRITICAL: use pixel size (NOT char size)
     face.set_pixel_sizes(0, fontSize)
 
     ascent = face.size.ascender >> 6
@@ -45,7 +44,7 @@ def ProcessFont(fontPath, fontSize, startOffset):
         advance = glyph.advance.x >> 6
 
         # Handle empty glyphs
-        if width == 0 or height == 0:
+        if width == 0 or height == 0 or charCode == ' ':
             glyphs.append({
                 "width": 0,
                 "height": 0,
@@ -77,9 +76,8 @@ def ProcessFont(fontPath, fontSize, startOffset):
         bitmapData.append(0)
         byteOffset += 1
 
-        for y in range(height):
-            for x in range(width):
-                # ✅ Correct bit extraction
+        for x in range(width):
+            for y in range(height):
                 byte = bmp.buffer[y * bmp.pitch + (x >> 3)]
                 pixel = byte & (0x80 >> (x & 7))
 
@@ -142,7 +140,8 @@ def GenerateFontFile(templatePath, outputPath, fontPaths, fontSize, generatePrev
     fonts = []
     offset = 0
 
-    os.makedirs("previews", exist_ok=True)
+    if generatePreview:
+        os.makedirs("previews", exist_ok=True)
 
     for fontPath in fontPaths:
         fontName = os.path.basename(fontPath).split('.', 1)[0]
